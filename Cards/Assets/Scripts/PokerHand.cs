@@ -18,6 +18,8 @@ public class PokerHand
         RoyalFlush       // ロイヤルストレートフラッシュ
     }
 
+    public static int HighCard = 0;
+
     public static Hand CardHand(List<Card> cards)
     {
         // まず数字をソートします(1,2,3,4,5等)
@@ -32,6 +34,7 @@ public class PokerHand
             {
                 cardsElement++;
                 kinds += card.Count();
+                HighCard = card.FirstOrDefault().Number;
             }
         }
         //フラッシュの確認 Suitが全て同じか
@@ -146,6 +149,7 @@ public class PokerHand
         }
         #endregion
 
+        HighCard = cards[4].Number;
         return Hand.None;
     }
 }

@@ -14,14 +14,22 @@ public class CPUHand : MonoBehaviour
     private List<Card> m_cpuHand = new List<Card>();
     public PokerHand.Hand CPUJudgeHand = PokerHand.Hand.None;
 
-    
+    private GameObject[] m_CPUCardSelectAnimators = new GameObject[5];
 
-    private void Update()
+    public int CPUHightCardNumber = 0;
+
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        for (int i = 0; i < m_cpuCards.Count; i++)
         {
-            CPUJudgeHand = PokerHand.CardHand(m_cpuHand);
+            m_cpuCards[i].GetComponentInChildren<Animator>().gameObject.SetActive(false);
         }
+    }
+
+    public void CPUJugeCard()
+    {
+        CPUJudgeHand = PokerHand.CardHand(m_cpuHand);
+        CPUHightCardNumber = PokerHand.HighCard;
     }
 
     private void CardUpDate(bool judge = false)

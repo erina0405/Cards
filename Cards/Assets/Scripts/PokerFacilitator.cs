@@ -10,6 +10,8 @@ public class PokerFacilitator : MonoBehaviour
 
     [SerializeField] private InputField m_betField;
 
+    [SerializeField] private GameProgressViewer m_gameProgressViewer;
+
     public static int ChangeCount = 1;
 
     private enum GameState
@@ -29,7 +31,7 @@ public class PokerFacilitator : MonoBehaviour
     public int CPUCoin = 100;
     public int BetCoin = 0;
     public bool PlayerWin = false;
-    private float m_resultViewTime = 1.0f;
+    private float m_resultViewTime = 5.0f;
 
     private GameState m_gameState = GameState.Invalid;
 
@@ -42,7 +44,7 @@ public class PokerFacilitator : MonoBehaviour
                 break;
             case GameState.Init:　//　初期化
 
-                m_resultViewTime = 1.0f;
+                m_resultViewTime = 5.0f;
 
                 m_betField.enabled = false;
 
@@ -60,6 +62,8 @@ public class PokerFacilitator : MonoBehaviour
                 break;
             case GameState.Change: //　プレイヤーは1回だけ(今は)カードをチェンジする
 
+                m_gameProgressViewer.SetGameChangeText();
+
                 if (ChangeCount < 1)
                 {
                     m_gameState = GameState.Bet;
@@ -67,6 +71,8 @@ public class PokerFacilitator : MonoBehaviour
                 break;
 
             case GameState.Bet:
+
+                m_gameProgressViewer.SetGameBetText();
 
                 m_betField.enabled = true;
 
@@ -88,6 +94,25 @@ public class PokerFacilitator : MonoBehaviour
                     PlayerCoin -= BetCoin;
                     CPUCoin += BetCoin;
                 }
+                else
+                {
+                    //役が同じだった場合
+                    if(m_playerHand.PlayerHighCardNumber > m_cpuHand.CPUHightCardNumber)
+                    {
+                        PlayerWin = true;
+                        PlayerCoin += BetCoin;
+                        CPUCoin -= BetCoin;
+                    }
+                    else
+                    {
+                        PlayerWin = false;
+                        PlayerCoin -= BetCoin;
+                        CPUCoin += BetCoin;
+                    }
+                }
+
+
+                m_gameProgressViewer.SetGameJudgeText(PlayerWin, m_playerHand.PlayerJudgeHand, m_cpuHand.CPUJudgeHand);
 
                 ChangeCount++;
 
@@ -101,15 +126,6 @@ public class PokerFacilitator : MonoBehaviour
 
                 m_resultViewTime -= Time.deltaTime;
 
-                if (PlayerWin)
-                {
-                    Debug.Log("Playerの勝ち");
-                }
-                else
-                {
-                    Debug.Log("CPUの勝ち");
-                }
-
                 if (m_resultViewTime < 0)
                 {
                     m_gameState = GameState.Init;
@@ -121,13 +137,6 @@ public class PokerFacilitator : MonoBehaviour
     public void BetInput()
     {
         BetCoin = int.Parse(m_betField.text);
-        if (BetCoin > 0)
-        {
-            m_gameState = GameState.judge;
-        }
-        else
-        {
-            m_gameState = GameState.Init;
-        }
+        m_gameState = GameState.judge;
     }
 }
